@@ -6,7 +6,7 @@ const SetCenter = styled.div`
   position:relative;
   justify-content:center;     //horizontal
   align-items:center;         //vertical
-  margin-top:150px;
+  margin-top:110px;
   
   width:100%;
   height:750px;
