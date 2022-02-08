@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-
+import React, {useState} from 'react';
+import styled, {css} from 'styled-components';
+import DotLoader from 'react-spinners/DotLoader';
 
 const Fullscreen = styled.div`
     position:fixed;
@@ -14,6 +14,13 @@ const Fullscreen = styled.div`
     justify-content:center;
     align-items:center;
 `;
+
+const override = css`
+    display: block;
+    margin-top:210px;
+    margin-bottom:210px;
+    margin-left:48%;
+`
 
 const AskModalBlock = styled.div`
     width:700px;
@@ -123,25 +130,30 @@ const MaterialModal = ({visible, data, cancel}) => {
   }
 
   return(
+    
     <Fullscreen>
         <AskModalBlock>
+        
             <table className='setTable'>
                 <tbody>
                     <tr>
-                        <td className='titleSet'>업소명</td><td className='contentSet'>{!!data&&data.C002.row[0].BSSH_NM}</td><td className='titleSet'>제품명</td><td className='contentSet'>{!!data&&data.C002.row[0].PRDLST_NM}</td>
+                        <td className='titleSet'>업소명</td><td className='contentSet'>{!!data&&data.BSSH_NM}</td><td className='titleSet'>제품명</td><td className='contentSet'>{!!data&&data.PRDLST_NM}</td>
                     </tr>
                     <tr>
-                        <td className='titleSet'>유형</td><td className='contentSet'>{!!data&&data.C002.row[0].PRDLST_DCNM}</td><td className='titleSet'>허가일자</td><td className='contentSet'>{!!data&&data.C002.row[0].PRMS_DT}</td>
+                        <td className='titleSet'>유형</td><td className='contentSet'>{!!data&&data.PRDLST_DCNM}</td><td className='titleSet'>허가일자</td><td className='contentSet'>{!!data&&data.PRMS_DT}</td>
                     </tr>
                 </tbody>
             </table>
             <div className='title'>원료</div>
             <div className='materialPage'>
-                    {!!data&&data.C002.row[0].RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
+                    {!!data&&data.RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
             </div>
             <div className='closebtn'>
                 <Button onClick={cancel}>닫기</Button>
             </div>
+        
+        
+        
         </AskModalBlock>
     </Fullscreen>
   )

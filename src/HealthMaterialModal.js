@@ -164,21 +164,23 @@ const HealthMaterialModal = ({visible, data, cancel}) => {
     return null;
   }
 
+  console.log(data)
+
   return(
     <Fullscreen>
         <AskModalBlock>
             <table className='setTable'>
                 <tbody>
                     <tr>
-                        <td className='titleSet'>업소명</td><td className='contentSet'>{!!data&&data.C003.row[0].BSSH_NM}</td><td className='titleSet'>제품명</td><td className='contentSet'>{!!data&&data.C003.row[0].PRDLST_NM}</td><td className='titleSet'>제품형태</td><td className='contentSet'>{!!data&&data.C003.row[0].PRDT_SHAP_CD_NM}</td>
+                        <td className='titleSet'>업소명</td><td className='contentSet'>{!!data&&data.BSSH_NM}</td><td className='titleSet'>제품명</td><td className='contentSet'>{!!data&&data.PRDLST_NM}</td><td className='titleSet'>제품형태</td><td className='contentSet'>{!!data&&data.PRDT_SHAP_CD_NM}</td>
                     </tr>
                     <tr>
-                        <td className='titleSet'>보고일자</td><td className='contentSet'>{!!data&&data.C003.row[0].PRMS_DT}</td>    <td className='titleSet'>유통기한</td><td className='contentSet'>{!!data&&data.C003.row[0].POG_DAYCNT}</td><td className='titleSet'>성상</td><td className='contentSet'>{!!data&&data.C003.row[0].DISPOS}</td>
+                        <td className='titleSet'>보고일자</td><td className='contentSet'>{!!data&&data.PRMS_DT}</td>    <td className='titleSet'>유통기한</td><td className='contentSet'>{!!data&&data.POG_DAYCNT}</td><td className='titleSet'>성상</td><td className='contentSet'>{!!data&&data.DISPOS}</td>
                     </tr>
 
 
                     <tr>
-                        <td className='titleSet'>최초생성일시</td><td className='contentSet'>{!!data&&data.C003.row[0].CRET_DTM}</td><td className='titleSet'>최종수정일시</td><td className='contentSet'>{!!data&&data.C003.row[0].LAST_UPDT_DTM}</td><td className='titleSet'>보관방법</td><td className='contentSet'>{!!data&&data.C003.row[0].CSTDY_MTHD}</td>
+                        <td className='titleSet'>최초생성일시</td><td className='contentSet'>{!!data&&data.CRET_DTM}</td><td className='titleSet'>최종수정일시</td><td className='contentSet'>{!!data&&data.LAST_UPDT_DTM}</td><td className='titleSet'>보관방법</td><td className='contentSet'>{!!data&&data.CSTDY_MTHD}</td>
                     </tr>
 
 
@@ -188,21 +190,21 @@ const HealthMaterialModal = ({visible, data, cancel}) => {
                     <div className='setOne'>
                     <div className='title'>섭취방법</div>
                     <div className='etcPage'>
-                    {!!data&&data.C003.row[0].NTK_MTHD}
+                    {!!data&&data.NTK_MTHD}
                     </div>
                     </div>
 
                     <div className='setOne'>
                     <div className='title'>섭취시주의사항</div>
                     <div className='etcPage'>
-                    {!!data&&data.C003.row[0].IFTKN_ATNT_MATR_CN}
+                    {!!data&&data.IFTKN_ATNT_MATR_CN}
                     </div>
                     </div>
 
                     <div className='setOne'>
                     <div className='title'>기준규격</div>
                     <div className='etcPage'>
-                    {!!data&&data.C003.row[0].NTK_MTHD}
+                    {!!data&&data.NTK_MTHD}
                     </div>
                     </div>
 
@@ -220,14 +222,14 @@ const HealthMaterialModal = ({visible, data, cancel}) => {
                 <div className='setOne'>
                 <div className='title'>주된기능성</div>
                 <div className='materialPage'>
-                        {!!data&&data.C003.row[0].PRIMARY_FNCLTY}
+                        {!!data&&data.PRIMARY_FNCLTY}
                 </div>
                 </div>
 
                 <div className='setOne'>
                 <div className='title'>원료</div>
                 <div className='materialPage'>
-                        {!!data&&data.C003.row[0].RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
+                        {!!data&&data.RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
                 </div>
                 </div>
             </div>

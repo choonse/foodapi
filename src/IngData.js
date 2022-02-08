@@ -139,11 +139,20 @@ const SetCenter = styled.div`
   .setSerialNum{
       width:180px;
   }
+  .setMaterial{
+      width:640px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+  }
 
+  .setMaterialContent{
+      text-align:left;
+  }
 
   .seteven{
       display: flex;
-      
+      line-height:45px;
     &:hover{
             background-color: #D9D6FF;
         }
@@ -154,9 +163,11 @@ const SetCenter = styled.div`
         }
     }
   }
+
   .titlecolor{
       background-color:lightgray;
   }
+
   .listhide{
         overflow:hidden;
         text-overflow: ellipsis;
@@ -326,7 +337,7 @@ const IngData = () => {
     const [allowDate, setAllowDate] = useState(true);
     const [product, setProduct] = useState(true);
     const [type, setType] = useState(true);
-    const [material, setMaterial] = useState(true);
+    const [material, setMaterial] = useState(false);
     const [nextFind, setNextFind] = useState(false); // next버튼 활성화
     const [searchUnit, setSearchUnit] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -405,23 +416,23 @@ const IngData = () => {
 
         setFindMany(data);
         setSearchUnit(data);
-
     }
 
     const materialShow = async e => {
 
-        const query = e.currentTarget.getAttribute('id');
-
-        try {
-            const res = await fetch(
-                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/1/LCNS_NO=${query}`
-            ,)
-            const data = await res.json();
-            setCompanyData(data);
-          } catch (err) {
-            console.log(err.message);
-          }
-          setMaterailModal(true);
+        setMaterailModal(true);
+        setCompanyData(result.C002.row[e.currentTarget.getAttribute('id')-1]);
+        
+        // const query = e.currentTarget.getAttribute('id');
+        // try {
+        //     const res = await fetch(
+        //         `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/10/PRDLST_REPORT_NO=${query}`
+        //     ,)
+        //     const data = await res.json();
+        //     setCompanyData(data);
+        //   } catch (err) {
+        //     console.log(err.message);
+        //   }
     }
 
     const cancel = () => {
@@ -461,6 +472,8 @@ const IngData = () => {
         }
     }
 
+    let cnt = 1;
+
     return(
         <SetCenter>
         <div className="centerline"></div>
@@ -499,8 +512,7 @@ const IngData = () => {
             <tbody>
                 <tr>
                     <td className="titlecolor">
-                        {/* <FormControlLabel label="검색 상세" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} /> */}
-                        검색 항목
+                    <FormControlLabel label="검색 항목" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
                     </td>
                     <td>   
                     <FormControlLabel label="업소명" control={<Checkbox checked={company} onChange={()=>{onChange(2)}}/>} />
@@ -521,7 +533,7 @@ const IngData = () => {
                     <FormControlLabel label="품목제조번호" control={<Checkbox checked={serialNum} onChange={()=>{onChange(3)}}/>} />
                     </td>
                     <td>   
-                    <FormControlLabel label="ALL" control={<Checkbox styled={{zIndex:2}} checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
+                    <FormControlLabel label="원재료" control={<Checkbox styled={{zIndex:2}} checked={material} onChange={()=>{onChange(7)}} />} />
                     </td>
                 </tr>
             </tbody>
@@ -555,23 +567,35 @@ const IngData = () => {
         </table>
         <table>
             <tbody>
-                <tr className='tableHead'>
+            <tr className='tableHead'>
+                    {material?
+                    <>
+                    {company?<td className="setCompany">업소명</td>:''}
+                    {product?<td className="setProduct">품목명</td>:''}
+                    {material?<td className="setMaterial">원재료</td>:''}
+                    </>
+                    :
+                    <>
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {type?<td className="setType">유형</td>:''}
                     {allowDate?<td className="setDate">허가일자</td>:''}
                     {regNum?<td className="setRegNum">인허가번호</td>:''}
                     {serialNum?<td className="setSerialNum">품목제조번호</td>:''}
-                </tr>
+                    </>
+
+                    }
+                    </tr>   
                 </tbody>
                 </table>
                 <div className="setPage">
                 <table className="contenttable">
                 <tbody>
                 {result?result.C002.row.map(list=>
-                <tr className="seteven" id={list.LCNS_NO} onClick={materialShow}>{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} </tr>
+                <tr className="seteven" id={cnt} onClick={materialShow}>{cnt++}{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
                 )
-                :<DotLoader color={'#6B66FF'} loading={loading} css={override} size={60} />
+                :
+                <DotLoader color={'#6B66FF'} loading={loading} css={override} size={60} />
                 }                        
             </tbody>
         </table>
