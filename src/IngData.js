@@ -5,6 +5,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import apikey from './apikey.json';
 import DotLoader from 'react-spinners/DotLoader';
 import MaterialModal from './MaterialModal';
+import DetailScanModal from './DetailScanModal';
 
 const SetCenter = styled.div`
   width:100%;
@@ -59,7 +60,7 @@ const SetCenter = styled.div`
   }
   .setPage{
       width:1200px;
-      height:510px;
+      height:490px;
       padding-bottom:10px;
       margin:0 auto;
       overflow:hidden;
@@ -237,6 +238,30 @@ const SetCenter = styled.div`
     border-radius: 3px;
 }
 
+.showMenu{
+    z-index:100;
+}
+
+.menuList{
+    width:150px;
+    height:50px;
+    margin-top:1px;
+    visibility: hidden;
+    background-color:gray;
+    color:white;
+    opacity:0;
+    &:hover{
+        background-color:#AAAAAA;
+    }
+}
+
+.showMenu:hover .menuList{
+    visibility:visible;
+    transition:linear 1s;
+    transition-delay:1s;
+    opacity:1;
+}
+
 .glow-on-hover:before {
     content: '';
     background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
@@ -293,7 +318,7 @@ const override = css`
     margin-left:50%;
 `
 
-const Data = () => {
+const IngData = () => {
 
     const [regNum, setRegNum] = useState(true);
     const [company, setCompany] = useState(true);
@@ -313,6 +338,7 @@ const Data = () => {
     const [companyData, setCompanyData] = useState();
     const [findMany, setFindMany] = useState(10);
     const [materialModal, setMaterailModal] = useState(false);
+    const [detailScanModal, setdetailScanModal] = useState(false);
 
     const onChange= (num) => {  
         if(num===1){
@@ -336,8 +362,11 @@ const Data = () => {
     const onSearch = async (next) => {
 
         setLoading(true);
-
         setResult();
+
+        if(!next){
+            setSearchUnit(0);
+        }
 
         let query = `1/${findMany}`;
 
@@ -392,12 +421,44 @@ const Data = () => {
           } catch (err) {
             console.log(err.message);
           }
-
           setMaterailModal(true);
     }
 
     const cancel = () => {
         setMaterailModal(false);
+    }
+
+    const detailscancancel = () => {
+        setdetailScanModal(false);
+    }
+
+    const detailScan = (e) => {
+        e.stopPropagation();
+        setdetailScanModal(true);
+    }
+
+    const executeDetailScan = async (company, product, raw, date, regNum, serialNum) => {
+
+        if(company||product||raw||date||regNum||serialNum){
+            
+            setResult('');
+            setLoading(true);
+
+            const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM='+raw:'RAWMTRL_NM='+raw:''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
+            // console.log(query)
+            try {
+                const res = await fetch(
+                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/1000/${query}`
+                ,)
+                const data = await res.json();
+                 setResult(data);
+                 setLoading(false);
+            } catch (err) {
+                console.log(err.message);
+            }
+        }else{
+            alert('최소 하나의 검색어를 입력해야 합니다.')
+        }
     }
 
     return(
@@ -406,7 +467,8 @@ const Data = () => {
         <table className='marginTop10 noline'>
         <tbody>
                 <tr>
-                    <td colSpan='3'>
+                    <td colSpan='3' style={{textAlign:'left',fontWeight:'bold',fontSize:'20px'}}>
+                        식품(첨가물)품목제조보고(원재료)
                     </td>
                     <td>
                     </td>
@@ -423,7 +485,10 @@ const Data = () => {
                     }
                     <td style={{'width':'10px'}}>  </td>
                     <td>
-                    <div className="glow-on-hover" onClick={()=>{onSearch();setNextFind(true);}}>검색</div>
+                    <div className="glow-on-hover showMenu" onClick={()=>{onSearch();setNextFind(true);}}>검색
+                    <div className='menuList' onClick={detailScan}>상세검색</div>
+                    </div>
+
                      </td>
                     
                 </tr>
@@ -435,7 +500,7 @@ const Data = () => {
                 <tr>
                     <td className="titlecolor">
                         {/* <FormControlLabel label="검색 상세" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} /> */}
-                        검색 상세
+                        검색 항목
                     </td>
                     <td>   
                     <FormControlLabel label="업소명" control={<Checkbox checked={company} onChange={()=>{onChange(2)}}/>} />
@@ -456,13 +521,13 @@ const Data = () => {
                     <FormControlLabel label="품목제조번호" control={<Checkbox checked={serialNum} onChange={()=>{onChange(3)}}/>} />
                     </td>
                     <td>   
-                    <FormControlLabel label="ALL" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
+                    <FormControlLabel label="ALL" control={<Checkbox styled={{zIndex:2}} checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
                     </td>
                 </tr>
             </tbody>
         </table>
         <table>
-        <tbody>
+            <tbody>
                 <tr>
                     <td className="titlecolor">
                     검색 표시  
@@ -488,36 +553,33 @@ const Data = () => {
                 </tr>
             </tbody>
         </table>
-
-            <table>
-                <tbody>
-                    <tr className='tableHead'>
-                        {company?<td className="setCompany">업소명</td>:''}
-                        {product?<td className="setProduct">품목명</td>:''}
-                        {type?<td className="setType">유형</td>:''}
-                        {allowDate?<td className="setDate">허가일자</td>:''}
-                        {regNum?<td className="setRegNum">인허가번호</td>:''}
-                        {serialNum?<td className="setSerialNum">품목제조번호</td>:''}
-                    </tr>
-                    </tbody>
-                    </table>
-                    <div className="setPage">
-                    <table className="contenttable">
-                    <tbody>
-                    {result?result.C002.row.map(list=>
-                    <tr className="seteven" id={list.LCNS_NO} onClick={materialShow}>{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} </tr>
-                    )
-                    :<DotLoader color={'#6B66FF'} loading={loading} css={override} size={60} />
-                    }                        
+        <table>
+            <tbody>
+                <tr className='tableHead'>
+                    {company?<td className="setCompany">업소명</td>:''}
+                    {product?<td className="setProduct">품목명</td>:''}
+                    {type?<td className="setType">유형</td>:''}
+                    {allowDate?<td className="setDate">허가일자</td>:''}
+                    {regNum?<td className="setRegNum">인허가번호</td>:''}
+                    {serialNum?<td className="setSerialNum">품목제조번호</td>:''}
+                </tr>
                 </tbody>
-            </table>
-        </div>
-        
+                </table>
+                <div className="setPage">
+                <table className="contenttable">
+                <tbody>
+                {result?result.C002.row.map(list=>
+                <tr className="seteven" id={list.LCNS_NO} onClick={materialShow}>{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} </tr>
+                )
+                :<DotLoader color={'#6B66FF'} loading={loading} css={override} size={60} />
+                }                        
+            </tbody>
+        </table>
+        </div>   
         <MaterialModal visible={materialModal} data={companyData} cancel={cancel}/>
+        <DetailScanModal visible={detailScanModal} cancel={detailscancancel} executeDetailScan={executeDetailScan}/>
         </SetCenter>
-    )
-    
+    )    
 }
 
-
-export default Data;
+export default IngData;

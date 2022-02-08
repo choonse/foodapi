@@ -1,6 +1,6 @@
 import './App.css';
 import styled from 'styled-components';
-import Data from './Data';
+import IngData from './IngData';
 
 const SetCenter = styled.div`
   position:relative;
@@ -14,7 +14,21 @@ const SetCenter = styled.div`
   padding-top:35px;
   ::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera*/
-}
+  }
+  animation:showUp 2s;
+  @keyframes showUp{
+    0%{
+      margin-top:700px;
+        height:200px;
+    }
+    60%{
+      margin-top:80px;
+    }
+    100%{
+      margin-top:110px;
+      height:790px;
+    }
+  }
 `;
 
 const SetBody = styled.div`
@@ -30,14 +44,14 @@ const SetBody = styled.div`
   border-top-right-radius:130px 150px;
 `;
 
-function Header() {
+function IngredientData() {
   return (
     <SetCenter>
       <SetBody>
-        <Data />
+        <IngData />
       </SetBody>
     </SetCenter>
   );
 }
 
-export default Header;
+export default IngredientData;

@@ -34,6 +34,9 @@ const AskModalBlock = styled.div`
         display:flex;
         overflow:hidden;
     }
+    .setTable{
+        width:100%;
+    }
     .titleSet{
         width:70px;
         display:inline-block;
@@ -108,6 +111,9 @@ const Button = styled.button`
     border:1px solid gray;
     border-radius:5px;
     background-color:#BDBDBD;
+    &:hover{
+        background-color:#D5D5D5;
+    }
 `;
 
 const MaterialModal = ({visible, data, cancel}) => {
@@ -119,7 +125,7 @@ const MaterialModal = ({visible, data, cancel}) => {
   return(
     <Fullscreen>
         <AskModalBlock>
-            <table>
+            <table className='setTable'>
                 <tbody>
                     <tr>
                         <td className='titleSet'>업소명</td><td className='contentSet'>{!!data&&data.C002.row[0].BSSH_NM}</td><td className='titleSet'>제품명</td><td className='contentSet'>{!!data&&data.C002.row[0].PRDLST_NM}</td>

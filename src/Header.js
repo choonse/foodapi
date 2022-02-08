@@ -12,8 +12,9 @@ const SetHeader = styled.div`
   top:0;
   bottom:0;
   right:0;
-  display:flex;
+  display:inline-flex;
   width:100%;
+  padding-left:50px;
   justify-content:center;     //horizontal
   align-items:center;         //vertical
   /* border-bottom-left-radius: 500px 50px;
@@ -39,6 +40,7 @@ const SetHeader = styled.div`
   font-weight:bold;
   font-size:65px;
   visibility:hidden;
+  display:inline-flex;
   animation:showName 4s forwards;
   animation-delay:2s;
   @keyframes showName{
@@ -57,12 +59,79 @@ const SetHeader = styled.div`
   }
 }
 
+.setMenu{
+  
+  margin-left:15px;
+  margin-top:15px;
+  width:150px;
+  cursor:pointer; 
+}
+
+.setMenu1{
+    width:20px;
+    height:35px;
+    background-color:gray;
+    line-height:35px;
+    text-align:center;
+}
+
+.menu1{
+    visibility: hidden;
+    width:100px;
+    background-color:gray;
+    color:white;   
+    border-bottom-right-radius:30%;
+    border-top-right-radius:30%;
+}
+
+.setMenu1:hover .menu1{
+  visibility:visible;
+  width:150px;
+  transition:linear 200ms;
+}
+
+.setMenu2{
+    width:20px;
+    height:35px;
+    background-color:#B2CCFF;
+    line-height:35px;
+    text-align:center;
+}
+
+.menu2{
+    visibility: hidden;
+    width:100px;
+    background-color:#B2CCFF;
+    color:black;
+    border-bottom-right-radius:30%;
+    border-top-right-radius:30%;   
+}
+
+.setMenu2:hover .menu2{
+  visibility:visible;
+  width:150px;
+  transition:linear 200ms;
+}
+
 `;
 
-function Header() {
+function Header({setMenu}) {
   return (
     <SetHeader>
-    <div className="title">Food API</div>
+    <div className="title">Food API    </div>
+    <div className='setMenu'>
+    <div className="setMenu1" onClick={()=>{setMenu(1)}}> 
+    <div className='menu1'>
+      식품 품목제조
+    </div>
+    </div>
+    <div className="setMenu2" onClick={()=>{setMenu(2)}}>
+    <div className='menu2'>
+      건기 식품제조
+    </div>
+    </div>
+    </div>
+
     </SetHeader>
   );
 }

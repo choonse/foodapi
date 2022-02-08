@@ -1,13 +1,22 @@
 import './App.css';
 import Header from './Header';
-import Bodydata from './Bodydata';
+import React, {useState} from 'react';
+import Ingredientdata from './IngredientData';
+import HealthData from './HealthData';
 
 function App() {
-  
+
+  const [menu, setMenu] = useState(1);
+
   return (
     <>
-    <Header />
-    <Bodydata />
+    <Header setMenu={setMenu} />
+    
+    {menu===1?
+    <Ingredientdata />
+    :
+    <HealthData />
+    }
     </>
   );
 
