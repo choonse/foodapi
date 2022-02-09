@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled, {css} from 'styled-components';
-import DotLoader from 'react-spinners/DotLoader';
 
 const Fullscreen = styled.div`
     position:fixed;
@@ -14,13 +13,6 @@ const Fullscreen = styled.div`
     justify-content:center;
     align-items:center;
 `;
-
-const override = css`
-    display: block;
-    margin-top:210px;
-    margin-bottom:210px;
-    margin-left:48%;
-`
 
 const AskModalBlock = styled.div`
     width:700px;
@@ -123,7 +115,13 @@ const Button = styled.button`
     }
 `;
 
-const MaterialModal = ({visible, data, cancel}) => {
+type Material = {
+    visible:boolean,
+    data:any,
+    cancel:()=>void
+}
+
+const MaterialModal = ({visible, data, cancel}:Material) => {
 
   if(!visible){
     return null;
@@ -146,7 +144,7 @@ const MaterialModal = ({visible, data, cancel}) => {
             </table>
             <div className='title'>원료</div>
             <div className='materialPage'>
-                    {!!data&&data.RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
+                    {!!data&&data.RAWMTRL_NM.split(',').map((list:any)=><div className='materialTr'>{list}</div>)}
             </div>
             <div className='closebtn'>
                 <Button onClick={cancel}>닫기</Button>

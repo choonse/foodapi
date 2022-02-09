@@ -129,7 +129,13 @@ const Button = styled.button`
     `} 
 `;
 
-const DetailScanModal = ({visible, executeDetailScan, cancel}) => {
+type Detail = {
+    visible:boolean,
+    executeDetailScan:(company:string, product:string, raw:string, date:string, regNum:string, serialNum:string)=>void,
+    cancel:()=>void
+}
+
+const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
 
     const [company, setCompany]=useState('');
     const [product, setProduct]=useState('');
@@ -156,7 +162,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}) => {
         cancel();
     }
 
-    const onChange = (e) => {
+    const onChange = (e:any) => {
         if(e.target.id==='company'){
             setCompany(e.target.value)
         }else if(e.target.id==='product'){
@@ -172,7 +178,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}) => {
         }
     }
 
-    const enterKey = (e) => {
+    const enterKey = (e:any) => {
         if(e.key==='Enter'){
             getScanned();
         }
@@ -240,7 +246,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}) => {
                 </tbody>
             </table>  
             <div className='closebtn'>
-                <Button color onClick={getScanned}>검색</Button>
+                <Button color={'true'} onClick={getScanned}>검색</Button>
                 <Button onClick={cancel}>닫기</Button>
             </div>
         </AskModalBlock>

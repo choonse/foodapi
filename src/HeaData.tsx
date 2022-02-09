@@ -4,7 +4,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import apikey from './apikey.json';
 import DotLoader from 'react-spinners/DotLoader';
-import MaterialModal from './MaterialModal';
+import HealthMaterialModal from './HealthMaterialModal';
 import DetailScanModal from './DetailScanModal';
 
 const SetCenter = styled.div`
@@ -16,7 +16,7 @@ const SetCenter = styled.div`
   .centerline{
       width:100px;   
       height:10px;
-      background-color:gray;
+      background-color:#B2CCFF;
       margin:0 auto;
   }
   .prevFind{
@@ -140,7 +140,7 @@ const SetCenter = styled.div`
       width:180px;
   }
   .setMaterial{
-      width:640px;
+      width:630px;
       overflow:hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -163,11 +163,9 @@ const SetCenter = styled.div`
         }
     }
   }
-
   .titlecolor{
       background-color:lightgray;
   }
-
   .listhide{
         overflow:hidden;
         text-overflow: ellipsis;
@@ -329,29 +327,35 @@ const override = css`
     margin-left:50%;
 `
 
-const IngData = () => {
+const HeaData = () => {
 
-    const [regNum, setRegNum] = useState(true);
-    const [company, setCompany] = useState(true);
-    const [serialNum, setSerialNum] = useState(true);
-    const [allowDate, setAllowDate] = useState(true);
-    const [product, setProduct] = useState(true);
-    const [type, setType] = useState(true);
-    const [material, setMaterial] = useState(false);
-    const [nextFind, setNextFind] = useState(false); // next버튼 활성화
-    const [searchUnit, setSearchUnit] = useState(0);
-    const [loading, setLoading] = useState(false);
+    interface Provider{
+        result:any,
+        C003:any,
+        row:any,
+    }
 
-    const [result, setResult] = useState(
+    const [regNum, setRegNum] = useState<boolean>(true);
+    const [company, setCompany] = useState<boolean>(true);
+    const [serialNum, setSerialNum] = useState<boolean>(true);
+    const [allowDate, setAllowDate] = useState<boolean>(true);
+    const [product, setProduct] = useState<boolean>(true);
+    const [type, setType] = useState<boolean>(true);
+    const [material, setMaterial] = useState<boolean>(false);
+    const [nextFind, setNextFind] = useState<boolean>(false); // next버튼 활성화
+    const [searchUnit, setSearchUnit] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [result, setResult] = useState<Provider|null>(
         // {"C002":{"total_count":"3","row":[{"PRDLST_REPORT_NO":"2011001517149","PRMS_DT":"20141215","LCNS_NO":"20110015171","PRDLST_NM":"GLOBE ULTRA DRY(글로브 울트라 드라이)","BSSH_NM":"하이트진로㈜강원공장","PRDLST_DCNM":"맥주","RAWMTRL_NM":"정제수,글루코아밀라아제,알파아밀라아제,효소제(베타글루카나아제),산도조절제(황산칼슘),이산화탄소,홉(펠렛+즙),전분,맥아"},{"PRDLST_REPORT_NO":"1990045801682","PRMS_DT":"20060110","LCNS_NO":"19900458016","PRDLST_NM":"NHY 구운어묵","BSSH_NM":"명가푸드","PRDLST_DCNM":"어묵","RAWMTRL_NM":"냉동연육,전분,밀가루,정제염,소르빈산칼륨,글루코노-δ-락톤,L-글루타민산나트륨,설탕"},{"PRDLST_REPORT_NO":"201100151715","PRMS_DT":"20130924","LCNS_NO":"20110015171","PRDLST_NM":"dry finish d(드라이피니시디)","BSSH_NM":"하이트진로㈜강원공장","PRDLST_DCNM":"맥주","RAWMTRL_NM":"맥아,전분,홉(펠렛+즙),이산화탄소,정제수"}],"RESULT":{"MSG":"정상처리되었습니다.","CODE":"INFO-000"}}}
     );
 
-    const [companyData, setCompanyData] = useState();
-    const [findMany, setFindMany] = useState(10);
-    const [materialModal, setMaterailModal] = useState(false);
-    const [detailScanModal, setdetailScanModal] = useState(false);
+    const [companyData, setCompanyData] = useState<any>();
+    const [findMany, setFindMany] = useState<number>(10);
+    const [materialModal, setMaterailModal] = useState<boolean>(false);
+    const [detailScanModal, setdetailScanModal] = useState<boolean>(false);
 
-    const onChange= (num) => {  
+    const onChange= (num:number) => {  
         if(num===1){
             setRegNum(data=>!data);
         }else if(num===2){
@@ -370,10 +374,10 @@ const IngData = () => {
         }
     }
 
-    const onSearch = async (next) => {
+    const onSearch = async (next:string|null) => {
 
         setLoading(true);
-        setResult();
+        setResult(null);
 
         if(!next){
             setSearchUnit(0);
@@ -393,13 +397,13 @@ const IngData = () => {
 
         try {
             const res = await fetch(
-                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/${query}`
+                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${query}`    //C003 건기식
             ,)
             const data = await res.json();
             setResult(data);
             setLoading(false);
             // console.log(data);
-          } catch (err) {
+          } catch (err:any) {
             console.log(err.message);
           }
     }
@@ -412,27 +416,30 @@ const IngData = () => {
 
     }
  
-    const setFindset = (data) => {
+    const setFindset = (data:any) => {
 
         setFindMany(data);
         setSearchUnit(data);
+
     }
 
-    const materialShow = async e => {
+    const materialShow = async (e:any) => {
 
+        setCompanyData(result?result.C003.row[e.currentTarget.getAttribute('id')-1]:null);
         setMaterailModal(true);
-        setCompanyData(result.C002.row[e.currentTarget.getAttribute('id')-1]);
-        
+
         // const query = e.currentTarget.getAttribute('id');
+
         // try {
         //     const res = await fetch(
-        //         `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/10/PRDLST_REPORT_NO=${query}`
+        //         `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/1/1/LCNS_NO=${query}`        //건기식
         //     ,)
         //     const data = await res.json();
         //     setCompanyData(data);
         //   } catch (err) {
         //     console.log(err.message);
         //   }
+          
     }
 
     const cancel = () => {
@@ -443,28 +450,28 @@ const IngData = () => {
         setdetailScanModal(false);
     }
 
-    const detailScan = (e) => {
+    const detailScan = (e:any) => {
         e.stopPropagation();
         setdetailScanModal(true);
     }
 
-    const executeDetailScan = async (company, product, raw, date, regNum, serialNum) => {
+    const executeDetailScan = async (company:string, product:string, raw:string, date:string, regNum:string, serialNum:string) => {
 
         if(company||product||raw||date||regNum||serialNum){
             
-            setResult('');
+            setResult(null);
             setLoading(true);
 
             const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM='+raw:'RAWMTRL_NM='+raw:''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
             // console.log(query)
             try {
                 const res = await fetch(
-                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/1000/${query}`
+                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/1/1000/${query}`     //C003 건기식
                 ,)
                 const data = await res.json();
                  setResult(data);
                  setLoading(false);
-            } catch (err) {
+            } catch (err:any) {
                 console.log(err.message);
             }
         }else{
@@ -480,8 +487,8 @@ const IngData = () => {
         <table className='marginTop10 noline'>
         <tbody>
                 <tr>
-                    <td colSpan='3' style={{textAlign:'left',fontWeight:'bold',fontSize:'20px'}}>
-                        식품(첨가물)품목제조보고(원재료)
+                    <td colSpan={3} style={{textAlign:'left',fontWeight:'bold',fontSize:'20px'}}>
+                    건강기능식품 품목제조신고(원재료)
                     </td>
                     <td>
                     </td>
@@ -498,7 +505,7 @@ const IngData = () => {
                     }
                     <td style={{'width':'10px'}}>  </td>
                     <td>
-                    <div className="glow-on-hover showMenu" onClick={()=>{onSearch();setNextFind(true);}}>검색
+                    <div className="glow-on-hover showMenu" onClick={()=>{onSearch(null);setNextFind(true);}}>검색
                     <div className='menuList' onClick={detailScan}>상세검색</div>
                     </div>
 
@@ -512,7 +519,7 @@ const IngData = () => {
             <tbody>
                 <tr>
                     <td className="titlecolor">
-                    <FormControlLabel label="검색 항목" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
+                        <FormControlLabel label="검색 상세" control={<Checkbox checked={!!regNum&&!!company&&!!serialNum&&!!allowDate&&!!product&&!!type&&!!material} onChange={()=>{setAll()}} />} />
                     </td>
                     <td>   
                     <FormControlLabel label="업소명" control={<Checkbox checked={company} onChange={()=>{onChange(2)}}/>} />
@@ -521,10 +528,10 @@ const IngData = () => {
                     <FormControlLabel label="품목명" control={<Checkbox checked={product} onChange={()=>{onChange(5)}}/>} />
                     </td>
                     <td>   
-                    <FormControlLabel label="유형" control={<Checkbox checked={type} onChange={()=>{onChange(6)}}/>} />
+                    <FormControlLabel label="제품형태" control={<Checkbox checked={type} onChange={()=>{onChange(6)}}/>} />
                     </td>
                     <td>   
-                    <FormControlLabel label="허가일자" control={<Checkbox checked={allowDate} onChange={()=>{onChange(4)}}/>} />
+                    <FormControlLabel label="보고일자" control={<Checkbox checked={allowDate} onChange={()=>{onChange(4)}}/>} />
                     </td>
                     <td>
                     <FormControlLabel label="인허가번호" control={<Checkbox checked={regNum} onChange={()=>{onChange(1)}}/>} />
@@ -533,7 +540,7 @@ const IngData = () => {
                     <FormControlLabel label="품목제조번호" control={<Checkbox checked={serialNum} onChange={()=>{onChange(3)}}/>} />
                     </td>
                     <td>   
-                    <FormControlLabel label="원재료" control={<Checkbox styled={{zIndex:2}} checked={material} onChange={()=>{onChange(7)}} />} />
+                    <FormControlLabel label="원재료" control={<Checkbox checked={material} onChange={()=>{onChange(7)}}/>} />
                     </td>
                 </tr>
             </tbody>
@@ -559,7 +566,7 @@ const IngData = () => {
                     <td className={findMany>499?"status5":'nonstatus5'} onClick={()=>{setFindset(500);setNextFind(false);}}>
                     ~500
                     </td>
-                    <td colSpan='2' className={findMany>999?"status6":'nonstatus6'} onClick={()=>{setFindset(1000);setNextFind(false);}}>
+                    <td colSpan={2} className={findMany>999?"status6":'nonstatus6'} onClick={()=>{setFindset(1000);setNextFind(false);}}>
                     ~1000
                     </td>
                 </tr>
@@ -579,31 +586,30 @@ const IngData = () => {
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {type?<td className="setType">유형</td>:''}
-                    {allowDate?<td className="setDate">허가일자</td>:''}
+                    {allowDate?<td className="setDate">신고일자</td>:''}
                     {regNum?<td className="setRegNum">인허가번호</td>:''}
                     {serialNum?<td className="setSerialNum">품목제조번호</td>:''}
                     </>
 
                     }
-                    </tr>   
+                    </tr> 
                 </tbody>
                 </table>
                 <div className="setPage">
                 <table className="contenttable">
                 <tbody>
-                {result?result.C002.row.map(list=>
-                <tr className="seteven" id={cnt} onClick={materialShow}>{cnt++}{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
+                {result?result.C003.row.map((list:any)=>
+                <tr className="seteven" id={String(cnt)} onClick={materialShow}>{cnt++}{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDT_SHAP_CD_NM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
                 )
-                :
-                <DotLoader color={'#6B66FF'} loading={loading} css={override} size={60} />
+                :<DotLoader color={'#6B66FF'} loading={loading} css={String(override)} size={60} />
                 }                        
             </tbody>
         </table>
         </div>   
-        <MaterialModal visible={materialModal} data={companyData} cancel={cancel}/>
+        <HealthMaterialModal visible={materialModal} data={companyData} cancel={cancel}/>
         <DetailScanModal visible={detailScanModal} cancel={detailscancancel} executeDetailScan={executeDetailScan}/>
         </SetCenter>
     )    
 }
 
-export default IngData;
+export default HeaData;

@@ -1,6 +1,5 @@
-import './App.css';
 import styled from 'styled-components';
-import HeaData from './HeaData';
+import IngData from './IngData';
 
 const SetCenter = styled.div`
   position:relative;
@@ -36,7 +35,7 @@ const SetBody = styled.div`
   padding-right:1rem;
   width:100%;
   margin:0 auto; /*가운데 정렬*/
-  border:7px solid #B2CCFF;
+  border:7px solid gray;
   width:1400px;
   height:790px;
   overflow:hidden;
@@ -48,7 +47,7 @@ function IngredientData() {
   return (
     <SetCenter>
       <SetBody>
-        <HeaData />
+        <IngData />
       </SetBody>
     </SetCenter>
   );

@@ -1,4 +1,3 @@
-import './App.css';
 import styled from 'styled-components';
 
 const SetHeader = styled.div`
@@ -115,7 +114,13 @@ const SetHeader = styled.div`
 
 `;
 
-function Header({setMenu}) {
+type Head = {
+
+  setMenu:(num:number)=>void
+
+}
+
+function Header({setMenu}:Head) {
   return (
     <SetHeader>
     <div className="title">Food API    </div>

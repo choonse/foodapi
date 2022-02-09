@@ -1,4 +1,3 @@
-import './App.css';
 import Header from './Header';
 import React, {useState} from 'react';
 import Ingredientdata from './IngredientData';
@@ -10,8 +9,7 @@ function App() {
 
   return (
     <>
-    <Header setMenu={setMenu} />
-    
+    <Header setMenu={setMenu} /> 
     {menu===1?
     <Ingredientdata />
     :
@@ -19,7 +17,6 @@ function App() {
     }
     </>
   );
-
 }
 
 export default App;

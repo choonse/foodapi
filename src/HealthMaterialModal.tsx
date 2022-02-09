@@ -158,7 +158,13 @@ const Button = styled.button`
     }
 `;
 
-const HealthMaterialModal = ({visible, data, cancel}) => {
+type HealthMaterial = {
+    visible:boolean,
+    data:any,
+    cancel:()=>void
+}
+
+const HealthMaterialModal = ({visible, data, cancel}:HealthMaterial) => {
 
   if(!visible){
     return null;
@@ -229,7 +235,7 @@ const HealthMaterialModal = ({visible, data, cancel}) => {
                 <div className='setOne'>
                 <div className='title'>원료</div>
                 <div className='materialPage'>
-                        {!!data&&data.RAWMTRL_NM.split(',').map(list=><div className='materialTr'>{list}</div>)}
+                        {!!data&&data.RAWMTRL_NM.split(',').map((list:any)=><div className='materialTr'>{list}</div>)}
                 </div>
                 </div>
             </div>
