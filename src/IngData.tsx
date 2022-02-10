@@ -6,6 +6,9 @@ import apikey from './apikey.json';
 import DotLoader from 'react-spinners/DotLoader';
 import MaterialModal from './MaterialModal';
 import DetailScanModal from './DetailScanModal';
+import ExcelJS from 'exceljs';
+import {saveAs} from 'file-saver';
+
 
 const SetCenter = styled.div`
   width:100%;
@@ -16,9 +19,27 @@ const SetCenter = styled.div`
   .centerline{
       width:100px;   
       height:10px;
-      background-color:gray;
       margin:0 auto;
+      display:block;
+      cursor:pointer;
   }
+  .showDown{
+    height:30px;
+    background:
+    visibility:hidden;
+    background-image:url(${window.location.origin + '/excel.png'});
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .centerline:hover .showDown{
+    height:70px;
+    visibility:visible;
+    transition:linear 1s;
+  }
+
+  
   .prevFind{
       background-color:#3DB7CC;
       color:white;
@@ -434,11 +455,56 @@ const IngData = () => {
 
     }
  
-    const setFindset = (data:any) => {
+    const excelOut = async () => {
 
+        console.log('excel Out');
+        const workbook = new ExcelJS.Workbook();
+
+        const worksheet = workbook.addWorksheet('리스트');
+
+        worksheet.columns=[
+            {header : 'No.', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '업소명', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '품목명', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '유형', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '허가일자', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '인허가번호', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '품목제조번호', key:'num', style:{alignment:{horizontal:'center'}}},
+            {header : '원료', key:'num', style:{alignment:{horizontal:'center'}}},
+        ];
+
+        worksheet.getColumn('A').width=10;
+        worksheet.getColumn('B').width=30;
+        worksheet.getColumn('C').width=40;
+        worksheet.getColumn('D').width=15;
+        worksheet.getColumn('E').width=20;
+        worksheet.getColumn('F').width=20;
+        worksheet.getColumn('G').width=20;
+        worksheet.getColumn('H').width=150; 
+        worksheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'A6A6A6'},
+        };
+
+        let numbering:number = listPage;
+
+        if(result){
+            result.C002.row.map((list:any)=>{
+                worksheet.addRow([numbering,list.BSSH_NM,list.PRDLST_NM,list.PRDLST_DCNM,list.PRMS_DT,list.LCNS_NO,list.PRDLST_REPORT_NO,list.RAWMTRL_NM]);            
+                return numbering++;            
+            });
+        }
+
+        await workbook.xlsx.writeBuffer().then(data=>{
+            const blob = new Blob([data]);
+            saveAs(blob, 'apidata.xlsx');
+        })
+    }
+
+    const setFindset = (data:any) => {
         setFindMany(data);
         setSearchUnit(data);
-
     }
 
     const materialShow = async (e:any) => {
@@ -510,7 +576,7 @@ const IngData = () => {
 
     return(
         <SetCenter>
-        <div className="centerline"></div>
+        <div className="centerline" onClick={excelOut}><div className="showDown"></div></div>
         <table className='marginTop10 noline'>
         <tbody>
                 <tr>
