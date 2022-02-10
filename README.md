@@ -11,11 +11,11 @@
 ![api02](https://user-images.githubusercontent.com/86334732/152930262-255da04d-3bc6-4fa6-90bb-fabed1068774.png)
 ![api04](https://user-images.githubusercontent.com/86334732/152930353-9c157b8a-79dc-41aa-ba30-c7c5fead0dac.png)
 ![api03](https://user-images.githubusercontent.com/86334732/152930271-e2b3c817-a502-4632-9ee3-e1d4de00c403.png)
-
-
+![plusss](https://user-images.githubusercontent.com/86334732/153351433-23c135c8-ee3a-4b53-a597-dea35d803638.png)
+![exccc](https://user-images.githubusercontent.com/86334732/153351441-251ecc11-33c9-44fa-abce-047e5f59a1d0.png)
 
 # Frontend 
 <span>React, Styled-components, Typescript, Material UI</span>
 
 # 프로젝트 진행
-3일(2022/02/07~2022/02/09)
+4일(2022/02/07~2022/02/10)
