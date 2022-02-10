@@ -121,11 +121,14 @@ const SetCenter = styled.div`
       border-bottom:2px solid black;
       display: flex;
   }
+  .setNumber{
+      width:50px;
+  }
   .setCompany{
-      width:250px;
+      width:230px;
   }
   .setProduct{
-      width:300px;
+      width:270px;
   }
   .setType{
       width:150px;
@@ -355,6 +358,8 @@ const HeaData = () => {
     const [materialModal, setMaterailModal] = useState<boolean>(false);
     const [detailScanModal, setdetailScanModal] = useState<boolean>(false);
 
+    const [listPage, setListPage] = useState<number>(1);
+
     const onChange= (num:number) => {  
         if(num===1){
             setRegNum(data=>!data);
@@ -376,36 +381,51 @@ const HeaData = () => {
 
     const onSearch = async (next:string|null) => {
 
-        setLoading(true);
-        setResult(null);
+        let process:boolean = true;
 
-        if(!next){
-            setSearchUnit(0);
+        setLoading(true);
+        
+
+        if(next===null){
+            setResult(null);
+            setSearchUnit(findMany);
+            setListPage(1);
         }
 
+        if(next==='before'&&listPage<findMany){
+            process=false;
+            setLoading(false);
+        }
+        
         let query = `1/${findMany}`;
 
         if(next==='next'){
+            setResult(null);
             query = `${searchUnit+1}/${searchUnit+findMany}`;
+            setListPage(searchUnit+1)
             setSearchUnit(searchUnit+findMany);
         }
 
-        if(next==='before'){
+        if(next==='before'&&process===true){
+            setResult(null);
             query = `${searchUnit-(findMany*2)+1}/${searchUnit-findMany}`;
-            setSearchUnit(searchUnit-findMany);            
+            setSearchUnit(unit=>unit-findMany);     
+            setListPage(searchUnit-(findMany*2)+1); 
         }
 
-        try {
-            const res = await fetch(
-                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${query}`    //C003 건기식
-            ,)
-            const data = await res.json();
-            setResult(data);
-            setLoading(false);
-            // console.log(data);
-          } catch (err:any) {
-            console.log(err.message);
-          }
+        if(process===true){
+            try {
+                const res = await fetch(
+                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${query}`    //C003 건기식
+                ,)
+                const data = await res.json();
+                setResult(data);
+                setLoading(false);
+                // console.log(data);
+            } catch (err:any) {
+                console.log(err.message);
+            }
+        }
     }
 
     const setAll = () => {
@@ -455,22 +475,32 @@ const HeaData = () => {
         setdetailScanModal(true);
     }
 
-    const executeDetailScan = async (company:string, product:string, raw:string, date:string, regNum:string, serialNum:string) => {
+    const executeDetailScan = async (company:string, product:string, raw:string, date:string, regNum:string, serialNum:string, setPage:number) => {
 
-        if(company||product||raw||date||regNum||serialNum){
+        setResult(null);
+
+        if(company||product||raw||date||regNum||serialNum||setPage){
             
-            setResult(null);
+            if(setPage!==1){
+                setListPage(setPage)
+            }
+
+            const page = setPage!==1?`${setPage}/${Number(setPage)+findMany}`:`${setPage}/${findMany}}`;
+            
+            setSearchUnit(Number(setPage)+findMany-1);
+
             setLoading(true);
 
             const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM='+raw:'RAWMTRL_NM='+raw:''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
-            // console.log(query)
+            console.log(query)
             try {
                 const res = await fetch(
-                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/1/1000/${query}`     //C003 건기식
+                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${page}/${query}`     //C003 건기식
                 ,)
                 const data = await res.json();
                  setResult(data);
                  setLoading(false);
+                 setNextFind(true);
             } catch (err:any) {
                 console.log(err.message);
             }
@@ -479,7 +509,7 @@ const HeaData = () => {
         }
     }
 
-    let cnt = 1;
+    let cnt = listPage;
 
     return(
         <SetCenter>
@@ -577,12 +607,14 @@ const HeaData = () => {
             <tr className='tableHead'>
                     {material?
                     <>
+                    <td className="setNumber">No.</td>
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {material?<td className="setMaterial">원재료</td>:''}
                     </>
                     :
                     <>
+                    <td className="setNumber">No.</td>
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {type?<td className="setType">유형</td>:''}
@@ -599,7 +631,7 @@ const HeaData = () => {
                 <table className="contenttable">
                 <tbody>
                 {result?result.C003.row.map((list:any)=>
-                <tr className="seteven" id={String(cnt)} onClick={materialShow}>{cnt++}{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDT_SHAP_CD_NM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
+                <tr className="seteven" id={String(cnt)} onClick={materialShow}><td className="setNumber">{cnt++}</td>{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDT_SHAP_CD_NM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
                 )
                 :<DotLoader color={'#6B66FF'} loading={loading} css={String(override)} size={60} />
                 }                        

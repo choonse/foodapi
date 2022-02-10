@@ -121,11 +121,14 @@ const SetCenter = styled.div`
       border-bottom:2px solid black;
       display: flex;
   }
+  .setNumber{
+      width:50px;
+  }
   .setCompany{
-      width:250px;
+      width:230px;
   }
   .setProduct{
-      width:300px;
+      width:270px;
   }
   .setType{
       width:150px;
@@ -140,7 +143,7 @@ const SetCenter = styled.div`
       width:180px;
   }
   .setMaterial{
-      width:640px;
+      width:630px;
       overflow:hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -163,11 +166,9 @@ const SetCenter = styled.div`
         }
     }
   }
-
   .titlecolor{
       background-color:lightgray;
   }
-
   .listhide{
         overflow:hidden;
         text-overflow: ellipsis;
@@ -352,10 +353,12 @@ const IngData = () => {
         // {"C002":{"total_count":"3","row":[{"PRDLST_REPORT_NO":"2011001517149","PRMS_DT":"20141215","LCNS_NO":"20110015171","PRDLST_NM":"GLOBE ULTRA DRY(글로브 울트라 드라이)","BSSH_NM":"하이트진로㈜강원공장","PRDLST_DCNM":"맥주","RAWMTRL_NM":"정제수,글루코아밀라아제,알파아밀라아제,효소제(베타글루카나아제),산도조절제(황산칼슘),이산화탄소,홉(펠렛+즙),전분,맥아"},{"PRDLST_REPORT_NO":"1990045801682","PRMS_DT":"20060110","LCNS_NO":"19900458016","PRDLST_NM":"NHY 구운어묵","BSSH_NM":"명가푸드","PRDLST_DCNM":"어묵","RAWMTRL_NM":"냉동연육,전분,밀가루,정제염,소르빈산칼륨,글루코노-δ-락톤,L-글루타민산나트륨,설탕"},{"PRDLST_REPORT_NO":"201100151715","PRMS_DT":"20130924","LCNS_NO":"20110015171","PRDLST_NM":"dry finish d(드라이피니시디)","BSSH_NM":"하이트진로㈜강원공장","PRDLST_DCNM":"맥주","RAWMTRL_NM":"맥아,전분,홉(펠렛+즙),이산화탄소,정제수"}],"RESULT":{"MSG":"정상처리되었습니다.","CODE":"INFO-000"}}}
     );
 
-    const [companyData, setCompanyData] = useState<Object|null>();
+    const [companyData, setCompanyData] = useState<any>();
     const [findMany, setFindMany] = useState<number>(10);
     const [materialModal, setMaterailModal] = useState<boolean>(false);
     const [detailScanModal, setdetailScanModal] = useState<boolean>(false);
+
+	const [listPage, setListPage] = useState<number>(1);
 
     const onChange= (num:Number):void => {  
         if(num===1){
@@ -376,38 +379,51 @@ const IngData = () => {
         }
     }
 
-    const onSearch = async (next:String|null) => {
+    const onSearch = async (next:string|null) => {
+        let process:boolean = true;
 
         setLoading(true);
-        setResult(null);
 
-        if(!next){
-            setSearchUnit(0);
+        if(next===null){
+            setResult(null);
+            setSearchUnit(findMany);
+            setListPage(1);
         }
 
+        if(next==='before'&&listPage<findMany){
+            process=false;
+            setLoading(false);
+        }
+        
         let query = `1/${findMany}`;
 
         if(next==='next'){
+            setResult(null);
             query = `${searchUnit+1}/${searchUnit+findMany}`;
+            setListPage(searchUnit+1)
             setSearchUnit(searchUnit+findMany);
         }
 
-        if(next==='before'){
+        if(next==='before'&&process===true){
+            setResult(null);
             query = `${searchUnit-(findMany*2)+1}/${searchUnit-findMany}`;
-            setSearchUnit(searchUnit-findMany);            
+            setSearchUnit(unit=>unit-findMany);     
+            setListPage(searchUnit-(findMany*2)+1); 
         }
 
-        try {
-            const res = await fetch(
-                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/${query}`
-            ,)
-            const data = await res.json();
-            setResult(data);
-            setLoading(false);
-            // console.log(data);
-          } catch (err:any) {
-            console.log(err.message);
-          }
+        if(process===true){
+	        try {
+	            const res = await fetch(
+	                `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/${query}`
+	            ,)
+	            const data = await res.json();
+	            setResult(data);
+	            setLoading(false);
+	            // console.log(data);
+	          } catch (err:any) {
+	            console.log(err.message);
+	          }
+        }
     }
 
     const setAll = () => {
@@ -422,6 +438,7 @@ const IngData = () => {
 
         setFindMany(data);
         setSearchUnit(data);
+
     }
 
     const materialShow = async (e:any) => {
@@ -456,22 +473,31 @@ const IngData = () => {
         setdetailScanModal(true);
     }
 
-    const executeDetailScan = async (company:String, product:String, raw:String, date:String, regNum:String, serialNum:String) => {
+    const executeDetailScan = async (company:String, product:String, raw:String, date:String, regNum:String, serialNum:String, setPage:number) => {
+        setResult(null);
 
-        if(company||product||raw||date||regNum||serialNum){
+        if(company||product||raw||date||regNum||serialNum||setPage){
             
-            setResult(null);
+            if(setPage!==1){
+                setListPage(setPage)
+            }
+
+            const page = setPage!==1?`${setPage}/${Number(setPage)+findMany}`:`${setPage}/${findMany}}`;
+            
+            setSearchUnit(Number(setPage)+findMany-1);
+
             setLoading(true);
 
             const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM='+raw:'RAWMTRL_NM='+raw:''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
             // console.log(query)
             try {
                 const res = await fetch(
-                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/1/1000/${query}`
+                    `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C002/json/${page}/${query}`
                 ,)
                 const data = await res.json();
                  setResult(data);
                  setLoading(false);
+                 setNextFind(true);
             } catch (err:any) {
                 console.log(err.message);
             }
@@ -480,7 +506,7 @@ const IngData = () => {
         }
     }
 
-    let cnt:number = 1;
+    let cnt = listPage;
 
     return(
         <SetCenter>
@@ -578,12 +604,14 @@ const IngData = () => {
             <tr className='tableHead'>
                     {material?
                     <>
+                    <td className="setNumber">No.</td>
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {material?<td className="setMaterial">원재료</td>:''}
                     </>
                     :
                     <>
+                    <td className="setNumber">No.</td>
                     {company?<td className="setCompany">업소명</td>:''}
                     {product?<td className="setProduct">품목명</td>:''}
                     {type?<td className="setType">유형</td>:''}
@@ -600,10 +628,9 @@ const IngData = () => {
                 <table className="contenttable">
                 <tbody>
                 {result?result.C002.row.map((list:any)=>
-                <tr className="seteven" id={String(cnt)} onClick={materialShow}>{cnt++}{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
+                <tr className="seteven" id={String(cnt)} onClick={materialShow}><td className="setNumber">{cnt++}</td>{company?<td className='listhide setCompany'>{list.BSSH_NM}</td>:''} {product?<td className='listhide setProduct'>{list.PRDLST_NM}</td>:''} {type&&!material?<td className='listhide setType'>{list.PRDLST_DCNM}</td>:''} {allowDate&&!material?<td className='listhide setDate'>{list.PRMS_DT}</td>:''} {regNum&&!material?<td className='listhide setRegNum'>{list.LCNS_NO}</td>:''} {serialNum&&!material?<td className='listhide setSerialNum'>{list.PRDLST_REPORT_NO}</td>:''} {material?<td className='listhide setMaterial setMaterialContent'>{list.RAWMTRL_NM}</td>:''}</tr>
                 )
-                :
-                <DotLoader color={'#6B66FF'} loading={loading} css={String(override)} size={60} />
+                :<DotLoader color={'#6B66FF'} loading={loading} css={String(override)} size={60} />
                 }                        
             </tbody>
         </table>

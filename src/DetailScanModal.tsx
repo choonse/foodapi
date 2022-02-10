@@ -131,7 +131,7 @@ const Button = styled.button`
 
 type Detail = {
     visible:boolean,
-    executeDetailScan:(company:string, product:string, raw:string, date:string, regNum:string, serialNum:string)=>void,
+    executeDetailScan:(company:string, product:string, raw:string, date:string, regNum:string, serialNum:string, pageSet:number)=>void,
     cancel:()=>void
 }
 
@@ -143,6 +143,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
     const [date, setDate]=useState('');
     const [regNum, setRegNum]=useState('');
     const [serialNum, setSerialNum]=useState('');
+    const [pageSet, setPageSet]=useState<number>(1);
 
     const getScanned = () => {
 
@@ -151,7 +152,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
             return;
         }        
 
-        executeDetailScan(company, product, raw, date, regNum, serialNum);
+        executeDetailScan(company, product, raw, date, regNum, serialNum, pageSet);
 
         setCompany('');
         setProduct('');
@@ -159,6 +160,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
         setDate('');
         setRegNum('');
         setSerialNum('');
+        setPageSet(1);
         cancel();
     }
 
@@ -175,6 +177,8 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
             setRegNum(e.target.value)
         }else if(e.target.id==='serialNum'){
             setSerialNum(e.target.value)
+        }else if(e.target.id==='pageSet'){
+            setPageSet(e.target.value)
         }
     }
 
@@ -242,7 +246,14 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
                             <StyledInput onChange={onChange} id='serialNum' onKeyPress={enterKey} />
                         </td>
                     </tr>
-                    
+                    <tr>
+                        <td className='title'>
+                            시작 페이지                 
+                        </td>
+                        <td className='content'>
+                            <StyledInput onChange={onChange} id='pageSet' onKeyPress={enterKey} />
+                        </td>
+                    </tr>
                 </tbody>
             </table>  
             <div className='closebtn'>
