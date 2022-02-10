@@ -216,7 +216,7 @@ const DetailScanModal = ({visible, executeDetailScan, cancel}:Detail) => {
                     </tr>
                     <tr>
                         <td className='title'>
-                            원재료명                 
+                            원재료명(식품)                 
                         </td>
                         <td className='content'>
                             <StyledInput onChange={onChange} id='raw' onKeyPress={enterKey} />

@@ -438,8 +438,17 @@ const HeaData = () => {
                     `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${query}`    //C003 건기식
                 ,)
                 const data = await res.json();
-                setResult(data);
-                setLoading(false);
+                if(data.C003.total_count==='0'){
+                    alert('검색 결과가 없습니다.')
+                    setLoading(false);
+                }else{
+                    setResult(data);
+                    setLoading(false);
+                    setNextFind(true);
+                }
+                
+                // setResult(data);
+                // setLoading(false);
                 // console.log(data);
             } catch (err:any) {
                 console.log(err.message);
@@ -571,22 +580,29 @@ const HeaData = () => {
                 setListPage(setPage)
             }
 
-            const page = setPage!==1?`${setPage}/${Number(setPage)+findMany}`:`${setPage}/${findMany}}`;
+            const page = setPage!==1?`${setPage}/${Number(setPage)+findMany}`:`${setPage}/${findMany}`;
             
             setSearchUnit(Number(setPage)+findMany-1);
 
             setLoading(true);
 
-            const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM='+raw:'RAWMTRL_NM='+raw:''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
-            console.log(query)
+            const query = `${company?'BSSH_NM='+company:''}${product?company?'&PRDLST_NM='+product:'PRDLST_NM='+product:''}${raw?(product||company)?'&RAWMTRL_NM=*'+raw+'*':'RAWMTRL_NM=*'+raw+'*':''}${date?(company||product||raw)?'&CHNG_DT='+date:'CHNG_DT='+date:''}${regNum?(company||product||raw||date)?'&LCNS_NO='+regNum:'LCNS_NO='+regNum:''}${serialNum?(company||product||raw||date)?'&PRDLST_REPORT_NO='+serialNum:'PRDLST_REPORT_NO='+serialNum:''}`;
+                        
             try {
                 const res = await fetch(
                     `https://openapi.foodsafetykorea.go.kr/api/${apikey.key}/C003/json/${page}/${query}`     //C003 건기식
                 ,)
                 const data = await res.json();
-                 setResult(data);
-                 setLoading(false);
-                 setNextFind(true);
+                
+                console.log(data)
+                if(data.C003.total_count==='0'){
+                    alert('검색 결과가 없습니다.')
+                    setLoading(false);
+                }else{
+                    setResult(data);
+                    setLoading(false);
+                    setNextFind(true);
+                }
             } catch (err:any) {
                 console.log(err.message);
             }
