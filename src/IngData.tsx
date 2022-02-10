@@ -9,7 +9,6 @@ import DetailScanModal from './DetailScanModal';
 import ExcelJS from 'exceljs';
 import {saveAs} from 'file-saver';
 
-
 const SetCenter = styled.div`
   width:100%;
   text-align:center;
@@ -32,14 +31,12 @@ const SetCenter = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
   }
-
   .centerline:hover .showDown{
     height:70px;
     visibility:visible;
     transition:linear 1s;
   }
 
-  
   .prevFind{
       background-color:#3DB7CC;
       color:white;
